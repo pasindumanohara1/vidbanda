@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { tmdb, IMAGE_BASE_URL, IMAGE_W1280_URL } from '../services/tmdb';
 import { MediaDetails, SeasonDetails } from '../types';
@@ -12,9 +12,9 @@ export const Details: React.FC = () => {
   const navigate = useNavigate();
   const [details, setDetails] = useState<MediaDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showPlayer, setShowPlayer] = useState(false);
   const [showTrailer, setShowTrailer] = useState(false);
   const { isInList, addToList, removeFromList } = useList();
+  const playerRef = useRef<HTMLDivElement>(null);
 
   // TV Show specific state
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
@@ -94,36 +94,19 @@ export const Details: React.FC = () => {
     }
   };
 
-  const handlePlayEpisode = (episodeNumber: number) => {
-    setSelectedEpisode(episodeNumber);
-    setShowPlayer(true);
+  const scrollToPlayer = () => {
+    if (playerRef.current) {
+      const offset = 100;
+      const elementPosition = playerRef.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - offset;
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+    }
   };
 
-  if (showPlayer) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black flex flex-col">
-        <div className="p-4 flex items-center gap-4 bg-gradient-to-b from-black/80 to-transparent">
-          <button
-            onClick={() => setShowPlayer(false)}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <h2 className="text-white font-medium text-lg">
-            {title} {type === 'tv' ? `- S${selectedSeason} E${selectedEpisode}` : ''}
-          </h2>
-        </div>
-        <div className="flex-1">
-          <Player 
-            mediaId={details.id.toString()} 
-            mediaType={type || 'movie'} 
-            season={selectedSeason} 
-            episode={selectedEpisode} 
-          />
-        </div>
-      </div>
-    );
-  }
+  const handlePlayEpisode = (episodeNumber: number) => {
+    setSelectedEpisode(episodeNumber);
+    scrollToPlayer();
+  };
 
   return (
     <div className="pb-20">
@@ -216,7 +199,7 @@ export const Details: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full">
                 <button
-                  onClick={() => setShowPlayer(true)}
+                  onClick={scrollToPlayer}
                   className="flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1"
                 >
                   <Play size={20} className="fill-current" /> Play Now
@@ -252,6 +235,23 @@ export const Details: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Player Section */}
+      <div ref={playerRef} className="container mx-auto px-4 md:px-6 mt-8 md:mt-12 scroll-mt-24">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-2 h-8 bg-blue-600 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.5)]"></div>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">Theatre Mode</h2>
+        </div>
+        
+        <div className="relative aspect-video w-full rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl bg-black border border-slate-200 dark:border-slate-800">
+          <Player 
+            mediaId={details.id.toString()} 
+            mediaType={type || 'movie'} 
+            season={selectedSeason} 
+            episode={selectedEpisode} 
+          />
         </div>
       </div>
 
