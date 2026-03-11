@@ -1,0 +1,146 @@
+import React, { useEffect, useState } from 'react';
+import { tmdb, IMAGE_W1280_URL } from '../services/tmdb';
+import { MediaItem } from '../types';
+import { MediaCard } from '../components/common/MediaCard';
+import { Play, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+export const Home: React.FC = () => {
+  const [trending, setTrending] = useState<MediaItem[]>([]);
+  const [popularMovies, setPopularMovies] = useState<MediaItem[]>([]);
+  const [popularTv, setPopularTv] = useState<MediaItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [trendingData, moviesData, tvData] = await Promise.all([
+          tmdb.getTrending('all', 'day'),
+          tmdb.getPopular('movie'),
+          tmdb.getPopular('tv'),
+        ]);
+
+        setTrending(trendingData.results);
+        setPopularMovies(moviesData.results);
+        setPopularTv(tvData.results);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  const heroItem = trending[0];
+  const heroTitle = heroItem?.title || heroItem?.name || heroItem?.original_title || heroItem?.original_name;
+
+  return (
+    <div className="flex flex-col gap-12 pb-12">
+      {/* Hero Section */}
+      {heroItem && (
+        <section className="relative w-full min-h-[85vh] md:min-h-[75vh] flex items-end pb-20 pt-32">
+          <div className="absolute inset-0 bg-slate-900">
+            {heroItem.backdrop_path && (
+              <img
+                src={`${IMAGE_W1280_URL}${heroItem.backdrop_path}`}
+                alt={heroTitle}
+                className="w-full h-full object-cover"
+                loading="eager"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-50/90 via-slate-50/40 to-transparent dark:from-slate-950/90 dark:via-slate-950/40 dark:to-transparent"></div>
+          </div>
+
+          <div className="container mx-auto px-4 md:px-6 relative z-10">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full uppercase tracking-wider">
+                  Trending Now
+                </span>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 drop-shadow-md">
+                  {heroItem.media_type === 'tv' ? 'TV Series' : 'Movie'}
+                </span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white mb-4 leading-tight drop-shadow-lg">
+                {heroTitle}
+              </h1>
+              <p className="text-base sm:text-lg text-slate-800 dark:text-slate-200 mb-8 line-clamp-3 max-w-xl drop-shadow-md font-medium">
+                {heroItem.overview}
+              </p>
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                <Link
+                  to={`/details/${heroItem.media_type || 'movie'}/${heroItem.id}`}
+                  className="flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1"
+                >
+                  <Play size={20} className="fill-current" /> Watch Now
+                </Link>
+                <Link
+                  to={`/details/${heroItem.media_type || 'movie'}/${heroItem.id}`}
+                  className="flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-900 dark:text-white rounded-full font-semibold flex items-center gap-2 transition-all backdrop-blur-sm"
+                >
+                  <Info size={20} /> More Info
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Content Rows */}
+      <div className="container mx-auto px-4 md:px-6 flex flex-col gap-12">
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Trending This Week</h2>
+            <Link to="/movies?sort=trending" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+              View All
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
+            {trending.slice(1, 13).map((item) => (
+              <MediaCard key={item.id} item={item} />
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Popular Movies</h2>
+            <Link to="/movies" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+              View All
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
+            {popularMovies.slice(0, 12).map((item) => (
+              <MediaCard key={item.id} item={{ ...item, media_type: 'movie' }} />
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Popular TV Shows</h2>
+            <Link to="/tv" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+              View All
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
+            {popularTv.slice(0, 12).map((item) => (
+              <MediaCard key={item.id} item={{ ...item, media_type: 'tv' }} />
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+};
