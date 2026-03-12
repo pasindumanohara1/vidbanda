@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Settings, RefreshCw } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 interface PlayerProps {
   mediaId: string;
@@ -10,54 +11,25 @@ interface PlayerProps {
 
 export const Player: React.FC<PlayerProps> = ({ mediaId, mediaType, season = 1, episode = 1 }) => {
   const servers = [
-    { id: 'vidlink', name: 'VidLink (Recommended)' },
-    { id: 'vidsrc.to', name: 'VidSrc.to' },
-    { id: 'vidsrc.me', name: 'VidSrc.me' },
-    { id: 'vidsrc.cc', name: 'VidSrc.cc' },
-    { id: 'vidsrc.pro', name: 'VidSrc.pro' },
-    { id: 'superembed', name: 'SuperEmbed' },
-    { id: 'autoembed', name: 'AutoEmbed' },
+    { id: 'vidlink', name: 'VidLink', url: 'https://vidlink.pro' },
+    { id: 'vidlink-net', name: 'VidLink Alt', url: 'https://vidlink.net' },
+    { id: 'vidsrc-net', name: 'VidSrc', url: 'https://vidsrc.net/embed' },
+    { id: 'vidsrc-in', name: 'VidSrc IN', url: 'https://vidsrc.in/embed' },
+    { id: 'vidsrc-pm', name: 'VidSrc PM', url: 'https://vidsrc.pm/embed' },
+    { id: 'vidsrc-xyz', name: 'VidSrc XYZ', url: 'https://vidsrc.xyz/embed' },
+    { id: 'embed-su', name: 'EmbedSU', url: 'https://embed.su/embed' },
   ];
 
   const [currentServerIndex, setCurrentServerIndex] = useState(0);
   const [showServers, setShowServers] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getEmbedUrl = (serverId: string) => {
-    switch (serverId) {
-      case 'vidlink':
-        return mediaType === 'movie'
-          ? `https://vidlink.pro/movie/${mediaId}?autoplay=false`
-          : `https://vidlink.pro/tv/${mediaId}/${season}/${episode}?autoplay=false`;
-      case 'vidsrc.to':
-        return mediaType === 'movie'
-          ? `https://vidsrc.to/embed/movie/${mediaId}`
-          : `https://vidsrc.to/embed/tv/${mediaId}/${season}/${episode}`;
-      case 'vidsrc.me':
-        return mediaType === 'movie' 
-          ? `https://vidsrc.me/embed/movie?tmdb=${mediaId}`
-          : `https://vidsrc.me/embed/tv?tmdb=${mediaId}&season=${season}&episode=${episode}`;
-      case 'vidsrc.cc':
-        return mediaType === 'movie'
-          ? `https://vidsrc.cc/v2/embed/movie/${mediaId}`
-          : `https://vidsrc.cc/v2/embed/tv/${mediaId}/${season}/${episode}`;
-      case 'vidsrc.pro':
-        return mediaType === 'movie'
-          ? `https://vidsrc.pro/embed/movie/${mediaId}`
-          : `https://vidsrc.pro/embed/tv/${mediaId}/${season}/${episode}`;
-      case 'superembed':
-        return mediaType === 'movie'
-          ? `https://multiembed.mov/?video_id=${mediaId}&tmdb=1`
-          : `https://multiembed.mov/?video_id=${mediaId}&tmdb=1&s=${season}&e=${episode}`;
-      case 'autoembed':
-        return mediaType === 'movie'
-          ? `https://autoembed.to/movie/tmdb/${mediaId}`
-          : `https://autoembed.to/tv/tmdb/${mediaId}-${season}-${episode}`;
-      default:
-        return mediaType === 'movie'
-          ? `https://vidlink.pro/movie/${mediaId}?autoplay=false`
-          : `https://vidlink.pro/tv/${mediaId}/${season}/${episode}?autoplay=false`;
+  const getEmbedUrl = (server: typeof servers[0]) => {
+    const baseUrl = server.url;
+    if (mediaType === 'movie') {
+      return `${baseUrl}/movie/${mediaId}?autoPlay=true&theme=3B82F6`;
     }
+    return `${baseUrl}/tv/${mediaId}/${season}/${episode}?autoPlay=true&theme=3B82F6`;
   };
 
   const handleNextServer = () => {
@@ -73,7 +45,7 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, mediaType, season = 1, 
             <div className="relative w-24 h-24 flex items-center justify-center mb-6">
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-blue-500 animate-spin opacity-80"></div>
               <img 
-                src="/logo.png" 
+                src={logo} 
                 alt="Loading..." 
                 className="w-12 h-12 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
               />
@@ -85,7 +57,7 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, mediaType, season = 1, 
         )}
         <iframe
           key={servers[currentServerIndex].id}
-          src={getEmbedUrl(servers[currentServerIndex].id)}
+          src={getEmbedUrl(servers[currentServerIndex])}
           className="absolute inset-0 w-full h-full border-0"
           allowFullScreen
           title="Video Player"

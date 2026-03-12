@@ -7,6 +7,7 @@ import { useList } from '../context/ListContext';
 import { Player } from '../components/media/Player';
 import { MediaCard } from '../components/common/MediaCard';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import logo from '../assets/logo.png';
 
 export const Details: React.FC = () => {
   const { type, id } = useParams<{ type: 'movie' | 'tv'; id: string }>();
@@ -154,7 +155,7 @@ export const Details: React.FC = () => {
                 />
               ) : (
                 <div className="w-full aspect-[2/3] flex flex-col items-center justify-center text-slate-400 gap-3">
-                  <img src="/logo.png" alt="Vidbanda" className="w-16 h-16 opacity-30 grayscale" />
+                  <img src={logo} alt="Vidbanda" className="w-16 h-16 opacity-30 grayscale" />
                   <span className="text-sm font-medium uppercase tracking-wider">No Image</span>
                 </div>
               )}
@@ -269,7 +270,7 @@ export const Details: React.FC = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                      <img src="/logo.png" alt="Vidbanda" className="w-8 h-8 opacity-30 grayscale" />
+                      <img src={logo} alt="Vidbanda" className="w-8 h-8 opacity-30 grayscale" />
                       <span className="text-[10px] font-medium uppercase tracking-wider">No Image</span>
                     </div>
                   )}
@@ -323,7 +324,7 @@ export const Details: React.FC = () => {
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                        <img src="/logo.png" alt="Vidbanda" className="w-10 h-10 opacity-30 grayscale" />
+                        <img src={logo} alt="Vidbanda" className="w-10 h-10 opacity-30 grayscale" />
                         <span className="text-xs font-medium uppercase tracking-wider">No Image</span>
                       </div>
                     )}

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Moon, Sun, PlayCircle, Menu, X, Bookmark } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import logo from '../../assets/logo.png';
 
 export const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
@@ -43,7 +44,7 @@ export const Navbar: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2 group">
-            <img src="/logo.png" alt="Vidbanda" className="h-8 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+            <img src={logo} alt="Vidbanda" className="h-8 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
