@@ -66,7 +66,7 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, mediaType, season = 1, 
   };
 
   return (
-    <div className="relative w-full h-full bg-black flex flex-col">
+    <div className="relative w-full h-full bg-black flex flex-col group">
       <div className="flex-1 relative">
         {isLoading && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm transition-opacity duration-300">
@@ -86,50 +86,53 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, mediaType, season = 1, 
           allow="autoplay; encrypted-media; picture-in-picture"
           onLoad={() => setIsLoading(false)}
         ></iframe>
-      </div>
 
-      {/* Player Controls Overlay */}
-      <div className="absolute bottom-4 right-4 flex gap-2">
-        <button
-          onClick={handleNextServer}
-          className="flex items-center gap-2 px-4 py-2 bg-black/60 hover:bg-black/80 text-white rounded-lg backdrop-blur-md transition-colors text-sm font-medium border border-white/10"
-          title="Switch to next server if current is not working"
-        >
-          <RefreshCw size={16} />
-          Switch Server
-        </button>
-        <div className="relative">
+        {/* Player Controls Overlay - Centered at top */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
-            onClick={() => setShowServers(!showServers)}
-            className="flex items-center gap-2 px-4 py-2 bg-black/60 hover:bg-black/80 text-white rounded-lg backdrop-blur-md transition-colors text-sm font-medium border border-white/10"
+            onClick={handleNextServer}
+            className="flex items-center gap-2 px-4 py-2 bg-black/80 hover:bg-black text-white rounded-full backdrop-blur-md transition-colors text-sm font-medium border border-white/20 shadow-lg"
+            title="Switch to next server if current is not working"
           >
-            <Settings size={16} />
-            Servers
+            <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
+            <span className="hidden sm:inline">Switch Server</span>
+            <span className="sm:hidden">Switch</span>
           </button>
           
-          {showServers && (
-            <div className="absolute bottom-full right-0 mb-2 w-48 bg-slate-900 border border-slate-800 rounded-lg shadow-xl overflow-hidden z-50">
-              {servers.map((server, index) => (
-                <button
-                  key={server.id}
-                  onClick={() => {
-                    if (index !== currentServerIndex) {
-                      setIsLoading(true);
-                      setCurrentServerIndex(index);
-                    }
-                    setShowServers(false);
-                  }}
-                  className={`w-full text-left px-4 py-3 text-sm transition-colors ${
-                    index === currentServerIndex
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  {server.name}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="relative">
+            <button
+              onClick={() => setShowServers(!showServers)}
+              className="flex items-center gap-2 px-4 py-2 bg-black/80 hover:bg-black text-white rounded-full backdrop-blur-md transition-colors text-sm font-medium border border-white/20 shadow-lg"
+            >
+              <Settings size={16} />
+              <span className="hidden sm:inline">Server: {servers[currentServerIndex].name.split(' ')[0]}</span>
+              <span className="sm:hidden">Servers</span>
+            </button>
+            
+            {showServers && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl overflow-hidden z-50">
+                {servers.map((server, index) => (
+                  <button
+                    key={server.id}
+                    onClick={() => {
+                      if (index !== currentServerIndex) {
+                        setIsLoading(true);
+                        setCurrentServerIndex(index);
+                      }
+                      setShowServers(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                      index === currentServerIndex
+                        ? 'bg-blue-600/80 text-white font-medium'
+                        : 'text-slate-300 hover:bg-white/10'
+                    }`}
+                  >
+                    {server.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -42,11 +42,8 @@ export const Navbar: React.FC = () => {
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-            <PlayCircle size={32} className="fill-current" />
-            <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Vidbanda
-            </span>
+          <Link to="/" className="flex items-center gap-2">
+            <img src="/logo.png" alt="Vidbanda" className="h-8" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
