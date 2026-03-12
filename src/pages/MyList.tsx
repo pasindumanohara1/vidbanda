@@ -1,12 +1,18 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useList } from '../context/ListContext';
 import { MediaCard } from '../components/common/MediaCard';
 import { Bookmark } from 'lucide-react';
+
 export const MyList: React.FC = () => {
   const { myList } = useList();
 
   return (
     <div className="container mx-auto px-4 md:px-6 pt-28 pb-8">
+      <Helmet>
+        <title>My List - Vidbanda</title>
+        <meta name="description" content="View your saved movies and TV shows on Vidbanda." />
+      </Helmet>
       <div className="flex items-center gap-3 mb-8">
         <Bookmark size={32} className="text-blue-500" />
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">My List</h1>

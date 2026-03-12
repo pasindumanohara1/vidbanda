@@ -14,13 +14,29 @@ const fetchFromTMDB = async <T>(endpoint: string, params: Record<string, string>
     ...params,
   });
   
-  const response = await fetch(`${BASE_URL}${endpoint}?${queryParams}`);
-  
-  if (!response.ok) {
-    throw new Error(`TMDB API error: ${response.statusText}`);
+  try {
+    const response = await fetch(`${BASE_URL}${endpoint}?${queryParams}`);
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Unauthorized: Invalid TMDB API Key. Please check your configuration.');
+      } else if (response.status === 404) {
+        throw new Error('Not Found: The requested movie, TV show, or resource could not be found.');
+      } else if (response.status === 429) {
+        throw new Error('Rate Limit Exceeded: Too many requests to TMDB API. Please try again later.');
+      } else if (response.status >= 500) {
+        throw new Error('Server Error: TMDB is currently experiencing issues. Please try again later.');
+      } else {
+        throw new Error(`TMDB API Error (${response.status}): ${response.statusText}`);
+      }
+    }
+    
+    return await response.json();
+  } catch (error) {
+    // Re-throw the error so it can be handled by the calling component
+    console.error('TMDB Fetch Error:', error);
+    throw error;
   }
-  
-  return response.json();
 };
 
 export const tmdb = {

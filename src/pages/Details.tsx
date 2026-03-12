@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { tmdb, IMAGE_BASE_URL, IMAGE_W1280_URL } from '../services/tmdb';
 import { MediaDetails, SeasonDetails } from '../types';
 import { Play, Plus, Check, Star, Clock, Calendar, ArrowLeft, Youtube, X, ChevronDown } from 'lucide-react';
@@ -7,6 +8,7 @@ import { useList } from '../context/ListContext';
 import { Player } from '../components/media/Player';
 import { MediaCard } from '../components/common/MediaCard';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+
 export const Details: React.FC = () => {
   const { type, id } = useParams<{ type: 'movie' | 'tv'; id: string }>();
   const navigate = useNavigate();
@@ -66,6 +68,9 @@ export const Details: React.FC = () => {
   if (!details) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <Helmet>
+          <title>Not Found - Vidbanda</title>
+        </Helmet>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Content not found</h2>
         <button onClick={() => navigate(-1)} className="text-blue-500 hover:underline">
           Go back
@@ -106,6 +111,11 @@ export const Details: React.FC = () => {
 
   return (
     <div className="pb-20">
+      <Helmet>
+        <title>{title} {year ? `(${year})` : ''} - Vidbanda</title>
+        <meta name="description" content={details.overview ? (details.overview.length > 150 ? `${details.overview.substring(0, 147)}...` : details.overview) : `Watch ${title} on Vidbanda.`} />
+        {details.poster_path && <meta property="og:image" content={`${IMAGE_BASE_URL}${details.poster_path}`} />}
+      </Helmet>
       {/* Trailer Modal */}
       {showTrailer && trailer && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 md:p-12 backdrop-blur-sm">
@@ -143,8 +153,8 @@ export const Details: React.FC = () => {
         </div>
 
         <div className="container mx-auto px-4 md:px-6 relative z-10 w-full">
-          <div className="flex flex-col md:flex-row gap-8 items-end w-full">
-            <div className="hidden md:block w-48 lg:w-64 shrink-0 rounded-xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 bg-slate-200 dark:bg-slate-800">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-end w-full text-center md:text-left">
+            <div className="w-32 sm:w-48 lg:w-64 shrink-0 rounded-xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 bg-slate-200 dark:bg-slate-800">
               {details.poster_path ? (
                 <img
                   src={`${IMAGE_BASE_URL}${details.poster_path}`}
@@ -159,12 +169,12 @@ export const Details: React.FC = () => {
               )}
             </div>
             
-            <div className="flex-1 w-full max-w-3xl">
+            <div className="flex-1 w-full max-w-3xl flex flex-col items-center md:items-start">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 drop-shadow-lg">
                 {title}
               </h1>
               
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm text-slate-800 dark:text-slate-200 mb-6 drop-shadow-md font-medium">
+              <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 sm:gap-4 text-sm text-slate-800 dark:text-slate-200 mb-6 drop-shadow-md font-medium">
                 <div className="flex items-center gap-1 text-yellow-500 font-bold bg-yellow-500/10 px-2 py-1 rounded backdrop-blur-sm">
                   <Star size={16} className="fill-current" />
                   <span>{details.vote_average ? details.vote_average.toFixed(1) : 'NR'}</span>
@@ -181,7 +191,7 @@ export const Details: React.FC = () => {
                     <span>{Math.floor(details.runtime / 60)}h {details.runtime % 60}m</span>
                   </div>
                 )}
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
                   {details.genres?.map((g) => (
                     <span key={g.id} className="px-2 py-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 text-xs backdrop-blur-sm">
                       {g.name}
@@ -190,14 +200,14 @@ export const Details: React.FC = () => {
                 </div>
               </div>
 
-              <p className="text-base sm:text-lg text-slate-800 dark:text-slate-200 mb-8 leading-relaxed drop-shadow-md font-medium">
+              <p className="text-sm sm:text-base md:text-lg text-slate-800 dark:text-slate-200 mb-8 leading-relaxed drop-shadow-md font-medium line-clamp-4 md:line-clamp-none">
                 {details.overview}
               </p>
 
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full">
+              <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 w-full">
                 <button
                   onClick={scrollToPlayer}
-                  className="flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1"
+                  className="w-full sm:w-auto flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1"
                 >
                   <Play size={20} className="fill-current" /> Play Now
                 </button>
@@ -205,7 +215,7 @@ export const Details: React.FC = () => {
                 {trailer && (
                   <button
                     onClick={() => setShowTrailer(true)}
-                    className="flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-1"
+                    className="w-full sm:w-auto flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-1"
                   >
                     <Youtube size={20} /> Trailer
                   </button>
@@ -213,7 +223,7 @@ export const Details: React.FC = () => {
 
                 <button
                   onClick={handleListToggle}
-                  className={`flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold flex items-center gap-2 transition-all ${
+                  className={`w-full sm:w-auto flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold flex items-center gap-2 transition-all ${
                     inList
                       ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white'
                       : 'bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 backdrop-blur-sm'

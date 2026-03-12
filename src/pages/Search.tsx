@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { tmdb } from '../services/tmdb';
 import { MediaItem } from '../types';
 import { MediaCard } from '../components/common/MediaCard';
-import { Filter, Search as SearchIcon } from 'lucide-react';
-import { Pagination } from '../components/common/Pagination';
+import { Filter, Search as SearchIcon, Info } from 'lucide-react';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const Search: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const initialPage = parseInt(searchParams.get('page') || '1', 10);
   
   const [results, setResults] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const observerTarget = useRef<HTMLDivElement>(null);
   
   // Filters
   const [mediaType, setMediaType] = useState<'movie' | 'tv'>('movie');
@@ -42,21 +42,29 @@ export const Search: React.FC = () => {
     fetchFilters();
     // Reset selected genre when media type changes, as genre IDs differ
     setSelectedGenre('');
-    setCurrentPage(1);
+    setPage(1);
+    setResults([]);
+    setHasMore(true);
   }, [mediaType]);
+
+  // Reset when query or filters change
+  useEffect(() => {
+    setResults([]);
+    setPage(1);
+    setHasMore(true);
+  }, [query, selectedGenre, selectedCountry]);
 
   useEffect(() => {
     const fetchResults = async () => {
       setLoading(true);
       try {
+        let data;
         if (query.trim()) {
           // If there's a search query, use multi-search
-          const data = await tmdb.search(query, currentPage);
-          const filtered = data.results.filter(
-            (item) => item.media_type === 'movie' || item.media_type === 'tv'
+          data = await tmdb.search(query, page);
+          data.results = data.results.filter(
+            (item: MediaItem) => item.media_type === 'movie' || item.media_type === 'tv'
           );
-          setResults(filtered);
-          setTotalPages(data.total_pages);
         } else {
           // If no query, use discover with filters
           const params: Record<string, string> = {
@@ -65,15 +73,24 @@ export const Search: React.FC = () => {
           if (selectedGenre) params.with_genres = selectedGenre;
           if (selectedCountry) params.with_origin_country = selectedCountry;
           
-          const data = await tmdb.discover(mediaType, params, currentPage);
+          data = await tmdb.discover(mediaType, params, page);
           // Discover endpoint doesn't return media_type, so we inject it
-          const resultsWithMediaType = data.results.map(item => ({
+          data.results = data.results.map((item: MediaItem) => ({
             ...item,
             media_type: mediaType
           }));
-          setResults(resultsWithMediaType);
-          setTotalPages(data.total_pages);
         }
+
+        if (page === 1) {
+          setResults(data.results);
+        } else {
+          setResults(prev => {
+            const newIds = new Set(prev.map(m => m.id));
+            const uniqueNew = data.results.filter((m: MediaItem) => !newIds.has(m.id));
+            return [...prev, ...uniqueNew];
+          });
+        }
+        setHasMore(data.page < data.total_pages);
       } catch (error) {
         console.error('Search/Discover error:', error);
       } finally {
@@ -82,15 +99,27 @@ export const Search: React.FC = () => {
     };
 
     fetchResults();
-  }, [query, mediaType, selectedGenre, selectedCountry, currentPage]);
+  }, [query, mediaType, selectedGenre, selectedCountry, page]);
+
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+    if (target.isIntersecting && hasMore && !loading) {
+      setPage((prev) => prev + 1);
+    }
+  }, [hasMore, loading]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, { threshold: 0.1 });
+    if (observerTarget.current) observer.observe(observerTarget.current);
+    return () => observer.disconnect();
+  }, [handleObserver]);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const input = form.elements.namedItem('searchInput') as HTMLInputElement;
-    setCurrentPage(1);
     if (input.value.trim()) {
-      setSearchParams({ q: input.value.trim(), page: '1' });
+      setSearchParams({ q: input.value.trim() });
     } else {
       setSearchParams({});
     }
@@ -99,20 +128,15 @@ export const Search: React.FC = () => {
   const clearFilters = () => {
     setSelectedGenre('');
     setSelectedCountry('');
-    setCurrentPage(1);
     setSearchParams({});
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    const newParams: Record<string, string> = { page: page.toString() };
-    if (query) newParams.q = query;
-    setSearchParams(newParams);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="container mx-auto px-4 md:px-6 pt-28 pb-8">
+      <Helmet>
+        <title>{query ? `Search Results for "${query}" - Vidbanda` : 'Discover & Search - Vidbanda'}</title>
+        <meta name="description" content={query ? `Search results for ${query} on Vidbanda.` : 'Search and discover movies and TV shows on Vidbanda.'} />
+      </Helmet>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
           {query ? `Search Results for "${query}"` : 'Discover'}
@@ -146,16 +170,18 @@ export const Search: React.FC = () => {
           {/* Media Type Toggle */}
           <div className="flex flex-col gap-1">
             <label className="text-xs text-slate-500 uppercase font-semibold tracking-wider">Type</label>
-            <div className="flex rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+            <div className={`flex rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 ${!!query ? 'opacity-50 cursor-not-allowed' : ''}`}>
               <button
-                onClick={() => { setMediaType('movie'); setCurrentPage(1); }}
-                className={`flex-1 py-2 text-sm font-medium transition-colors ${mediaType === 'movie' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                onClick={() => { setMediaType('movie'); }}
+                disabled={!!query}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${mediaType === 'movie' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'} disabled:pointer-events-none`}
               >
                 Movies
               </button>
               <button
-                onClick={() => { setMediaType('tv'); setCurrentPage(1); }}
-                className={`flex-1 py-2 text-sm font-medium transition-colors ${mediaType === 'tv' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                onClick={() => { setMediaType('tv'); }}
+                disabled={!!query}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${mediaType === 'tv' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'} disabled:pointer-events-none`}
               >
                 TV Shows
               </button>
@@ -167,9 +193,9 @@ export const Search: React.FC = () => {
             <label className="text-xs text-slate-500 uppercase font-semibold tracking-wider">Genre</label>
             <select
               value={selectedGenre}
-              onChange={(e) => { setSelectedGenre(e.target.value); setCurrentPage(1); }}
+              onChange={(e) => { setSelectedGenre(e.target.value); }}
               disabled={!!query} // Disable filters when searching by query
-              className="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-blue-500 disabled:opacity-50"
+              className="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Genres</option>
               {genres.map(g => (
@@ -183,9 +209,9 @@ export const Search: React.FC = () => {
             <label className="text-xs text-slate-500 uppercase font-semibold tracking-wider">Country</label>
             <select
               value={selectedCountry}
-              onChange={(e) => { setSelectedCountry(e.target.value); setCurrentPage(1); }}
+              onChange={(e) => { setSelectedCountry(e.target.value); }}
               disabled={!!query} // Disable filters when searching by query
-              className="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-blue-500 disabled:opacity-50"
+              className="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Countries</option>
               {countries.map(c => (
@@ -195,28 +221,28 @@ export const Search: React.FC = () => {
           </div>
         </div>
         {query && (
-          <p className="text-xs text-amber-500 mt-3">
-            * Filters are disabled while searching by name. Clear the search to use filters.
-          </p>
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg flex items-center gap-2 text-sm text-blue-700 dark:text-blue-400">
+            <Info size={16} className="shrink-0" />
+            <p>Filters are not applicable during name searches. Clear your search to use Discover filters.</p>
+          </div>
         )}
       </div>
 
       {/* Results */}
-      {loading ? (
-        <LoadingSpinner />
-      ) : results.length > 0 ? (
+      {results.length > 0 ? (
         <>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
             {results.map((item) => (
               <MediaCard key={item.id} item={item} />
             ))}
           </div>
-          <Pagination 
-            currentPage={currentPage} 
-            totalPages={totalPages} 
-            onPageChange={handlePageChange} 
-          />
+          <div ref={observerTarget} className="py-8 flex justify-center">
+            {loading && hasMore && <LoadingSpinner />}
+            {!hasMore && <p className="text-slate-500 dark:text-slate-400">No more results to load.</p>}
+          </div>
         </>
+      ) : loading ? (
+        <LoadingSpinner />
       ) : (
         <div className="text-center py-20 text-slate-500 dark:text-slate-400">
           <p className="text-xl">No results found.</p>

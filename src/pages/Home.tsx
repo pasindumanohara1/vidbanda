@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { tmdb, IMAGE_W1280_URL } from '../services/tmdb';
 import { MediaItem } from '../types';
 import { MediaCard } from '../components/common/MediaCard';
@@ -11,30 +12,60 @@ export const Home: React.FC = () => {
   const [popularMovies, setPopularMovies] = useState<MediaItem[]>([]);
   const [popularTv, setPopularTv] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Infinite scroll state for trending
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [trendingData, moviesData, tvData] = await Promise.all([
-          tmdb.getTrending('all', 'day'),
-          tmdb.getPopular('movie'),
-          tmdb.getPopular('tv'),
-        ]);
+        if (page === 1) {
+          setLoading(true);
+          const [trendingData, moviesData, tvData] = await Promise.all([
+            tmdb.getTrending('all', 'day', 1),
+            tmdb.getPopular('movie', 1),
+            tmdb.getPopular('tv', 1),
+          ]);
 
-        setTrending(trendingData.results);
-        setPopularMovies(moviesData.results);
-        setPopularTv(tvData.results);
+          setTrending(trendingData.results);
+          setPopularMovies(moviesData.results);
+          setPopularTv(tvData.results);
+          setHasMore(trendingData.page < trendingData.total_pages);
+          setLoading(false);
+        } else {
+          const trendingData = await tmdb.getTrending('all', 'day', page);
+          setTrending(prev => {
+            const newIds = new Set(prev.map(m => m.id));
+            const uniqueNew = trendingData.results.filter((m: MediaItem) => !newIds.has(m.id));
+            return [...prev, ...uniqueNew];
+          });
+          setHasMore(trendingData.page < trendingData.total_pages);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
-      } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [page]);
 
-  if (loading) {
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+    if (target.isIntersecting && hasMore && !loading) {
+      setPage((prev) => prev + 1);
+    }
+  }, [hasMore, loading]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, { threshold: 0.1 });
+    if (observerTarget.current) observer.observe(observerTarget.current);
+    return () => observer.disconnect();
+  }, [handleObserver]);
+
+  if (loading && page === 1) {
     return <LoadingSpinner />;
   }
 
@@ -43,6 +74,10 @@ export const Home: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-12 pb-12">
+      <Helmet>
+        <title>Vidbanda - Watch Movies and TV Shows Online</title>
+        <meta name="description" content="Discover and watch the latest trending movies and TV shows on Vidbanda. Explore popular content, create your watchlist, and enjoy seamless streaming." />
+      </Helmet>
       {/* Hero Section */}
       {heroItem && (
         <section className="relative w-full min-h-[85vh] md:min-h-[75vh] flex items-end pb-20 pt-32">
@@ -75,16 +110,16 @@ export const Home: React.FC = () => {
               <p className="text-base sm:text-lg text-slate-800 dark:text-slate-200 mb-8 line-clamp-3 max-w-xl drop-shadow-md font-medium">
                 {heroItem.overview}
               </p>
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 sm:gap-4 w-full">
                 <Link
                   to={`/details/${heroItem.media_type || 'movie'}/${heroItem.id}`}
-                  className="flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1"
+                  className="w-full sm:w-auto flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1"
                 >
                   <Play size={20} className="fill-current" /> Watch Now
                 </Link>
                 <Link
                   to={`/details/${heroItem.media_type || 'movie'}/${heroItem.id}`}
-                  className="flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-900 dark:text-white rounded-full font-semibold flex items-center gap-2 transition-all backdrop-blur-sm"
+                  className="w-full sm:w-auto flex-1 sm:flex-none justify-center px-6 sm:px-8 py-3 sm:py-4 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-900 dark:text-white rounded-full font-semibold flex items-center gap-2 transition-all backdrop-blur-sm"
                 >
                   <Info size={20} /> More Info
                 </Link>
@@ -96,20 +131,6 @@ export const Home: React.FC = () => {
 
       {/* Content Rows */}
       <div className="container mx-auto px-4 md:px-6 flex flex-col gap-12">
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Trending This Week</h2>
-            <Link to="/movies?sort=trending" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-              View All
-            </Link>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
-            {trending.slice(1, 13).map((item) => (
-              <MediaCard key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
-
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Popular Movies</h2>
@@ -135,6 +156,22 @@ export const Home: React.FC = () => {
             {popularTv.slice(0, 12).map((item) => (
               <MediaCard key={item.id} item={{ ...item, media_type: 'tv' }} />
             ))}
+          </div>
+        </section>
+
+        {/* Infinite Trending Section */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Trending This Week</h2>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
+            {trending.slice(1).map((item) => (
+              <MediaCard key={item.id} item={item} />
+            ))}
+          </div>
+          <div ref={observerTarget} className="py-8 flex justify-center">
+            {page > 1 && hasMore && <LoadingSpinner />}
+            {!hasMore && <p className="text-slate-500 dark:text-slate-400">No more trending items to load.</p>}
           </div>
         </section>
       </div>
