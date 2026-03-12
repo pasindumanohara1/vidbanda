@@ -8,6 +8,9 @@ import { useList } from '../context/ListContext';
 import { Player } from '../components/media/Player';
 import { MediaCard } from '../components/common/MediaCard';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { ResponsiveBanner } from '../components/ads/ResponsiveBanner';
+import { NativeBanner } from '../components/ads/NativeBanner';
+import { AdBanner } from '../components/ads/AdBanner';
 
 export const Details: React.FC = () => {
   const { type, id } = useParams<{ type: 'movie' | 'tv'; id: string }>();
@@ -247,7 +250,9 @@ export const Details: React.FC = () => {
 
       {/* Player Section */}
       <div ref={playerRef} className="container mx-auto px-4 md:px-6 mt-8 md:mt-12 scroll-mt-24">
-        <div className="flex items-center gap-4 mb-6">
+        <ResponsiveBanner />
+        
+        <div className="flex items-center gap-4 mb-6 mt-8">
           <div className="w-2 h-8 bg-blue-600 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.5)]"></div>
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">Theatre Mode</h2>
         </div>
@@ -260,6 +265,10 @@ export const Details: React.FC = () => {
             season={selectedSeason} 
             episode={selectedEpisode} 
           />
+        </div>
+        
+        <div className="mt-8">
+          <NativeBanner />
         </div>
       </div>
 
@@ -367,6 +376,9 @@ export const Details: React.FC = () => {
       {/* Similar Content Section */}
       {details.similar?.results && details.similar.results.length > 0 && (
         <div className="container mx-auto px-4 md:px-6 mt-16">
+          <div className="flex justify-center mb-8">
+            <AdBanner adKey="b7b9503357eacfd5d6a20f48a28440b7" width={300} height={250} />
+          </div>
           <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">Similar {type === 'tv' ? 'TV Shows' : 'Movies'}</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
             {details.similar.results.slice(0, 12).map((item) => (

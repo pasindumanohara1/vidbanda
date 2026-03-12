@@ -42,7 +42,12 @@ export const Navbar: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2 group">
-            <img src="/logo.png" alt="Vidbanda" className="h-8 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+            <img 
+              src="/logo.png" 
+              alt="Vidbanda" 
+              className="h-8 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" 
+              onError={(e) => { e.currentTarget.src = `${window.location.origin}/logo.png`; }}
+            />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">

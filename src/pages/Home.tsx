@@ -6,6 +6,9 @@ import { MediaCard } from '../components/common/MediaCard';
 import { Play, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { ResponsiveBanner } from '../components/ads/ResponsiveBanner';
+import { NativeBanner } from '../components/ads/NativeBanner';
+import { AdBanner } from '../components/ads/AdBanner';
 
 export const Home: React.FC = () => {
   const [trending, setTrending] = useState<MediaItem[]>([]);
@@ -131,6 +134,8 @@ export const Home: React.FC = () => {
 
       {/* Content Rows */}
       <div className="container mx-auto px-4 md:px-6 flex flex-col gap-12">
+        <ResponsiveBanner />
+        
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Popular Movies</h2>
@@ -144,6 +149,8 @@ export const Home: React.FC = () => {
             ))}
           </div>
         </section>
+
+        <NativeBanner />
 
         <section>
           <div className="flex items-center justify-between mb-6">
@@ -174,6 +181,10 @@ export const Home: React.FC = () => {
             {!hasMore && <p className="text-slate-500 dark:text-slate-400">No more trending items to load.</p>}
           </div>
         </section>
+        
+        <div className="flex justify-center mb-8">
+          <AdBanner adKey="b7b9503357eacfd5d6a20f48a28440b7" width={300} height={250} />
+        </div>
       </div>
     </div>
   );

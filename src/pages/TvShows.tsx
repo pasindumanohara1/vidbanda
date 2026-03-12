@@ -6,6 +6,8 @@ import { MediaItem } from '../types';
 import { MediaCard } from '../components/common/MediaCard';
 import { FilterBar } from '../components/common/FilterBar';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { ResponsiveBanner } from '../components/ads/ResponsiveBanner';
+import { AdBanner } from '../components/ads/AdBanner';
 
 export const TvShows: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -90,6 +92,8 @@ export const TvShows: React.FC = () => {
         <FilterBar mediaType="tv" onFilterChange={handleFilterChange} initialSort={initialSort} />
       </div>
 
+      <ResponsiveBanner />
+
       {shows.length > 0 ? (
         <>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
@@ -100,6 +104,10 @@ export const TvShows: React.FC = () => {
           <div ref={observerTarget} className="py-8 flex justify-center">
             {loading && hasMore && <LoadingSpinner />}
             {!hasMore && <p className="text-slate-500 dark:text-slate-400">No more TV shows to load.</p>}
+          </div>
+          
+          <div className="flex justify-center mt-4">
+            <AdBanner adKey="b7b9503357eacfd5d6a20f48a28440b7" width={300} height={250} />
           </div>
         </>
       ) : loading ? (

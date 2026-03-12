@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, RefreshCw } from 'lucide-react';
+import { Settings, RefreshCw, Download } from 'lucide-react';
 interface PlayerProps {
   mediaId: string;
   imdbId?: string;
@@ -13,10 +13,13 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, seas
     { id: 'vidsrc-me', name: 'VidSrc.me', url: 'https://vidsrcme.ru' },
     { id: 'vidlink', name: 'VidLink', url: 'https://vidlink.pro' },
     { id: 'vidsrc-net', name: 'VidSrc.net', url: 'https://vidsrc.net' },
+    { id: 'vidsrc-pro', name: 'VidSrc.pro', url: 'https://vidsrc.pro' },
+    { id: 'vidsrc-cc', name: 'VidSrc.cc', url: 'https://vidsrc.cc' },
     { id: 'vidsrc-in', name: 'VidSrc.in', url: 'https://vidsrc.in' },
     { id: 'vidsrc-pm', name: 'VidSrc.pm', url: 'https://vidsrc.pm' },
     { id: 'vidsrc-xyz', name: 'VidSrc.xyz', url: 'https://vidsrc.xyz' },
     { id: 'vidsrc-to', name: 'VidSrc.to', url: 'https://vidsrc.to' },
+    { id: 'superembed', name: 'SuperEmbed', url: 'https://superembed.top' },
     { id: 'embed-su', name: 'Embed.su', url: 'https://embed.su' },
     { id: '2embed', name: '2Embed', url: 'https://www.2embed.cc' },
     { id: 'vidbinge', name: 'VidBinge', url: 'https://vidbinge.to' },
@@ -48,11 +51,26 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, seas
           ? `${server.url}/embed/movie/${id}`
           : `${server.url}/embed/tv/${id}/${season}/${episode}`;
       
+      case 'vidsrc-pro':
+        return mediaType === 'movie'
+          ? `${server.url}/embed/movie/${id}`
+          : `${server.url}/embed/tv/${id}/${season}/${episode}`;
+          
+      case 'vidsrc-cc':
+        return mediaType === 'movie'
+          ? `${server.url}/v2/embed/movie/${id}`
+          : `${server.url}/v2/embed/tv/${id}/${season}/${episode}`;
+
       case 'vidsrc-to':
         return mediaType === 'movie'
           ? `${server.url}/embed/movie/${mediaId}`
           : `${server.url}/embed/tv/${mediaId}/${season}/${episode}`;
           
+      case 'superembed':
+        return mediaType === 'movie'
+          ? `${server.url}/movie/${id}`
+          : `${server.url}/tv/${id}/${season}/${episode}`;
+
       case 'embed-su':
         return mediaType === 'movie'
           ? `${server.url}/embed/movie/${id}`
@@ -93,9 +111,10 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, seas
             <div className="relative w-24 h-24 flex items-center justify-center mb-6">
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-blue-500 animate-spin opacity-80"></div>
               <img 
-                src="/logo.png" 
+                src={`${window.location.origin}/logo.png`} 
                 alt="Loading..." 
                 className="w-12 h-12 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+                onError={(e) => { e.currentTarget.src = '/logo.png'; }}
               />
             </div>
             <p className="text-white font-medium text-lg animate-pulse tracking-wide">
@@ -116,6 +135,18 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, seas
 
         {/* Player Controls Overlay - Centered at top */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <a
+            href="https://www.effectivegatecpm.com/z9icytup?key=0ad10dd7c15367b15db7864bfbce7781"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600/90 hover:bg-blue-600 text-white rounded-full backdrop-blur-md transition-colors text-sm font-medium border border-blue-400/30 shadow-[0_0_15px_rgba(37,99,235,0.5)]"
+            title="Download in HD"
+          >
+            <Download size={16} className="animate-bounce" />
+            <span className="hidden sm:inline">Download HD</span>
+            <span className="sm:hidden">HD</span>
+          </a>
+
           <button
             onClick={handleNextServer}
             className="flex items-center gap-2 px-4 py-2 bg-black/80 hover:bg-black text-white rounded-full backdrop-blur-md transition-colors text-sm font-medium border border-white/20 shadow-lg"
