@@ -42,7 +42,17 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-3">
-            <img src="/logo.png" alt="Vidbanda" className="w-12 h-12 opacity-30 grayscale" />
+            <img 
+              src="/logo.png" 
+              alt="Vidbanda" 
+              className="w-12 h-12 opacity-30 grayscale" 
+              onError={(e) => { 
+                const target = e.currentTarget;
+                if (target.src !== window.location.origin + '/logo.png') {
+                  target.src = window.location.origin + '/logo.png';
+                }
+              }}
+            />
             <span className="text-xs font-medium uppercase tracking-wider">No Image</span>
           </div>
         )}

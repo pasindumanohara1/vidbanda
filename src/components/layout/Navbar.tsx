@@ -46,7 +46,12 @@ export const Navbar: React.FC = () => {
               src="/logo.png" 
               alt="Vidbanda" 
               className="h-8 transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" 
-              onError={(e) => { e.currentTarget.src = `${window.location.origin}/logo.png`; }}
+              onError={(e) => { 
+                const target = e.currentTarget;
+                if (target.src !== window.location.origin + '/logo.png') {
+                  target.src = window.location.origin + '/logo.png';
+                }
+              }}
             />
           </Link>
 

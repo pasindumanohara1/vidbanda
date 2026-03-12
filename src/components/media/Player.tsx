@@ -111,10 +111,15 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, seas
             <div className="relative w-24 h-24 flex items-center justify-center mb-6">
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-blue-500 animate-spin opacity-80"></div>
               <img 
-                src={`${window.location.origin}/logo.png`} 
+                src="/logo.png" 
                 alt="Loading..." 
                 className="w-12 h-12 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
-                onError={(e) => { e.currentTarget.src = '/logo.png'; }}
+                onError={(e) => { 
+                  const target = e.currentTarget;
+                  if (target.src !== window.location.origin + '/logo.png') {
+                    target.src = window.location.origin + '/logo.png';
+                  }
+                }}
               />
             </div>
             <p className="text-white font-medium text-lg animate-pulse tracking-wide">
@@ -134,7 +139,7 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, seas
         ></iframe>
 
         {/* Player Controls Overlay - Centered at top */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-opacity duration-300">
           <a
             href="https://www.effectivegatecpm.com/z9icytup?key=0ad10dd7c15367b15db7864bfbce7781"
             target="_blank"

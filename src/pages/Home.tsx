@@ -155,6 +155,10 @@ export const Home: React.FC = () => {
           <div className="hidden md:block">
             <AdBanner adKey="b7b9503357eacfd5d6a20f48a28440b7" width={300} height={250} />
           </div>
+          {/* Mobile only ad */}
+          <div className="block md:hidden">
+            <AdBanner adKey="5d2edd3ac89c6c1954a1ef6a3db75a0c" width={320} height={50} />
+          </div>
         </div>
 
         <NativeBanner />
@@ -170,6 +174,10 @@ export const Home: React.FC = () => {
             {popularTv.slice(0, 12).map((item) => (
               <MediaCard key={item.id} item={{ ...item, media_type: 'tv' }} />
             ))}
+          </div>
+          {/* Mobile only ad at bottom of section */}
+          <div className="block sm:hidden mt-6">
+            <AdBanner adKey="5d2edd3ac89c6c1954a1ef6a3db75a0c" width={320} height={50} />
           </div>
         </section>
 

@@ -182,7 +182,17 @@ export const Details: React.FC = () => {
                 />
               ) : (
                 <div className="w-full aspect-[2/3] flex flex-col items-center justify-center text-slate-400 gap-3">
-                  <img src="/logo.png" alt="Vidbanda" className="w-16 h-16 opacity-30 grayscale" />
+                  <img 
+                    src="/logo.png" 
+                    alt="Vidbanda" 
+                    className="w-16 h-16 opacity-30 grayscale" 
+                    onError={(e) => { 
+                      const target = e.currentTarget;
+                      if (target.src !== window.location.origin + '/logo.png') {
+                        target.src = window.location.origin + '/logo.png';
+                      }
+                    }}
+                  />
                   <span className="text-sm font-medium uppercase tracking-wider">No Image</span>
                 </div>
               )}
@@ -306,6 +316,10 @@ export const Details: React.FC = () => {
 
       <div className="container mx-auto px-4 md:px-6 mt-6">
         <ResponsiveBanner />
+        {/* Mobile-only extra ad */}
+        <div className="block sm:hidden mt-4">
+          <AdBanner adKey="5d2edd3ac89c6c1954a1ef6a3db75a0c" width={320} height={50} />
+        </div>
       </div>
 
       {/* Player Section */}
@@ -364,7 +378,17 @@ export const Details: React.FC = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                      <img src="/logo.png" alt="Vidbanda" className="w-8 h-8 opacity-30 grayscale" />
+                      <img 
+                        src="/logo.png" 
+                        alt="Vidbanda" 
+                        className="w-8 h-8 opacity-30 grayscale" 
+                        onError={(e) => { 
+                          const target = e.currentTarget;
+                          if (target.src !== window.location.origin + '/logo.png') {
+                            target.src = window.location.origin + '/logo.png';
+                          }
+                        }}
+                      />
                       <span className="text-[10px] font-medium uppercase tracking-wider">No Image</span>
                     </div>
                   )}
@@ -418,7 +442,17 @@ export const Details: React.FC = () => {
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                        <img src="/logo.png" alt="Vidbanda" className="w-10 h-10 opacity-30 grayscale" />
+                        <img 
+                          src="/logo.png" 
+                          alt="Vidbanda" 
+                          className="w-10 h-10 opacity-30 grayscale" 
+                          onError={(e) => { 
+                            const target = e.currentTarget;
+                            if (target.src !== window.location.origin + '/logo.png') {
+                              target.src = window.location.origin + '/logo.png';
+                            }
+                          }}
+                        />
                         <span className="text-xs font-medium uppercase tracking-wider">No Image</span>
                       </div>
                     )}

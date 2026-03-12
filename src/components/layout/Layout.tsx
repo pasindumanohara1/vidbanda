@@ -16,7 +16,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             src="/logo.png" 
             alt="Vidbanda" 
             className="h-8 opacity-50 hover:opacity-100 transition-opacity duration-300 grayscale hover:grayscale-0" 
-            onError={(e) => { e.currentTarget.src = `${window.location.origin}/logo.png`; }}
+            onError={(e) => { 
+              const target = e.currentTarget;
+              if (target.src !== window.location.origin + '/logo.png') {
+                target.src = window.location.origin + '/logo.png';
+              }
+            }}
           />
           <div>
             <p>&copy; {new Date().getFullYear()} Vidbanda. All rights reserved.</p>

@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/"
+      "source": "/((?!assets/|logo.png|favicon.ico|android-chrome|apple-touch-icon|.*\\..*).*)",
+      "destination": "/index.html"
     }
   ]
 }
