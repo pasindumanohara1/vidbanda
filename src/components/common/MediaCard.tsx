@@ -4,8 +4,6 @@ import { Star, Play, Plus, Check } from 'lucide-react';
 import { MediaItem } from '../../types';
 import { IMAGE_BASE_URL } from '../../services/tmdb';
 import { useList } from '../../context/ListContext';
-import logo from '@/src/assets/logo.png';
-
 interface MediaCardProps {
   item: MediaItem;
 }
@@ -44,7 +42,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-3">
-            <img src={logo} alt="Vidbanda" className="w-12 h-12 opacity-30 grayscale" />
+            <img src="/logo.png" alt="Vidbanda" className="w-12 h-12 opacity-30 grayscale" />
             <span className="text-xs font-medium uppercase tracking-wider">No Image</span>
           </div>
         )}

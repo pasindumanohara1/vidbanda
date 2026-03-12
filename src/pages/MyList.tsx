@@ -2,8 +2,6 @@ import React from 'react';
 import { useList } from '../context/ListContext';
 import { MediaCard } from '../components/common/MediaCard';
 import { Bookmark } from 'lucide-react';
-import logo from '@/src/assets/logo.png';
-
 export const MyList: React.FC = () => {
   const { myList } = useList();
 
@@ -23,7 +21,7 @@ export const MyList: React.FC = () => {
       ) : (
         <div className="flex flex-col items-center justify-center py-32 text-slate-500 dark:text-slate-400 text-center">
           <div className="relative mb-6">
-            <img src={logo} alt="Vidbanda" className="w-24 h-24 opacity-20 grayscale" />
+            <img src="/logo.png" alt="Vidbanda" className="w-24 h-24 opacity-20 grayscale" />
             <Bookmark size={32} className="absolute -bottom-2 -right-2 text-slate-300 dark:text-slate-600" />
           </div>
           <h2 className="text-2xl font-semibold mb-2 text-slate-900 dark:text-white">Your list is empty</h2>

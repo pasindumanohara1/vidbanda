@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Settings, RefreshCw } from 'lucide-react';
-import logo from '@/src/assets/logo.png';
-
 interface PlayerProps {
   mediaId: string;
   imdbId?: string;
@@ -12,6 +10,7 @@ interface PlayerProps {
 
 export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, season = 1, episode = 1 }) => {
   const servers = [
+    { id: 'vidsrc-me', name: 'VidSrc.me', url: 'https://vidsrcme.ru' },
     { id: 'vidlink', name: 'VidLink', url: 'https://vidlink.pro' },
     { id: 'vidsrc-net', name: 'VidSrc.net', url: 'https://vidsrc.net' },
     { id: 'vidsrc-in', name: 'VidSrc.in', url: 'https://vidsrc.in' },
@@ -32,6 +31,10 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, seas
     const id = imdbId || mediaId;
     
     switch (server.id) {
+      case 'vidsrc-me':
+        return mediaType === 'movie'
+          ? `${server.url}/embed/movie/${id}`
+          : `${server.url}/embed/tv/${id}/${season}-${episode}`;
       case 'vidlink':
         return mediaType === 'movie'
           ? `${server.url}/movie/${mediaId}?primaryColor=3B82F6&autoplay=false`
@@ -90,7 +93,7 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, seas
             <div className="relative w-24 h-24 flex items-center justify-center mb-6">
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-blue-500 animate-spin opacity-80"></div>
               <img 
-                src={logo} 
+                src="/logo.png" 
                 alt="Loading..." 
                 className="w-12 h-12 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
               />
