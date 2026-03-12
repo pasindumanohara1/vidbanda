@@ -60,6 +60,14 @@ export const Navbar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
+            <a
+              href="https://www.effectivegatecpm.com/z9icytup?key=0ad10dd7c15367b15db7864bfbce7781"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-bold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors"
+            >
+              Download HD
+            </a>
           </nav>
         </div>
 
@@ -118,6 +126,14 @@ export const Navbar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
+            <a
+              href="https://www.effectivegatecpm.com/z9icytup?key=0ad10dd7c15367b15db7864bfbce7781"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-3 rounded-lg bg-emerald-600 text-white font-bold text-center mt-2"
+            >
+              Download HD Movies
+            </a>
           </nav>
           
           <div className="flex items-center justify-between px-4 py-2 border-t border-slate-200 dark:border-slate-800 mt-2">

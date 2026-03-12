@@ -150,6 +150,13 @@ export const Home: React.FC = () => {
           </div>
         </section>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AdBanner adKey="b7b9503357eacfd5d6a20f48a28440b7" width={300} height={250} />
+          <div className="hidden md:block">
+            <AdBanner adKey="b7b9503357eacfd5d6a20f48a28440b7" width={300} height={250} />
+          </div>
+        </div>
+
         <NativeBanner />
 
         <section>
@@ -176,9 +183,9 @@ export const Home: React.FC = () => {
               <MediaCard key={item.id} item={item} />
             ))}
           </div>
-          <div ref={observerTarget} className="py-8 flex justify-center">
+          <div ref={observerTarget} className="py-2 flex justify-center min-h-[40px]">
             {page > 1 && hasMore && <LoadingSpinner />}
-            {!hasMore && <p className="text-slate-500 dark:text-slate-400">No more trending items to load.</p>}
+            {!hasMore && <p className="text-slate-500 dark:text-slate-400 text-sm">No more trending items to load.</p>}
           </div>
         </section>
         

@@ -7,6 +7,7 @@ import { MediaCard } from '../components/common/MediaCard';
 import { FilterBar } from '../components/common/FilterBar';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { ResponsiveBanner } from '../components/ads/ResponsiveBanner';
+import { NativeBanner } from '../components/ads/NativeBanner';
 import { AdBanner } from '../components/ads/AdBanner';
 
 export const Movies: React.FC = () => {
@@ -94,6 +95,10 @@ export const Movies: React.FC = () => {
 
       <ResponsiveBanner />
 
+      <div className="my-8">
+        <NativeBanner />
+      </div>
+
       {movies.length > 0 ? (
         <>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
@@ -101,9 +106,9 @@ export const Movies: React.FC = () => {
               <MediaCard key={item.id} item={{ ...item, media_type: 'movie' }} />
             ))}
           </div>
-          <div ref={observerTarget} className="py-8 flex justify-center">
+          <div ref={observerTarget} className="py-2 flex justify-center min-h-[40px]">
             {loading && hasMore && <LoadingSpinner />}
-            {!hasMore && <p className="text-slate-500 dark:text-slate-400">No more movies to load.</p>}
+            {!hasMore && <p className="text-slate-500 dark:text-slate-400 text-sm">No more movies to load.</p>}
           </div>
           
           <div className="flex justify-center mt-4">

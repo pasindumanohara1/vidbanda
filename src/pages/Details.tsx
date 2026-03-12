@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { tmdb, IMAGE_BASE_URL, IMAGE_W1280_URL } from '../services/tmdb';
 import { MediaDetails, SeasonDetails } from '../types';
-import { Play, Plus, Check, Star, Clock, Calendar, ArrowLeft, Youtube, X, ChevronDown } from 'lucide-react';
+import { Play, Plus, Check, Star, Clock, Calendar, ArrowLeft, Youtube, X, ChevronDown, Heart, Share2, Bookmark } from 'lucide-react';
 import { useList } from '../context/ListContext';
 import { Player } from '../components/media/Player';
 import { MediaCard } from '../components/common/MediaCard';
@@ -18,8 +18,24 @@ export const Details: React.FC = () => {
   const [details, setDetails] = useState<MediaDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   const { isInList, addToList, removeFromList } = useList();
   const playerRef = useRef<HTMLDivElement>(null);
+
+  const SMARTLINK_URL = "https://www.effectivegatecpm.com/z9icytup?key=0ad10dd7c15367b15db7864bfbce7781";
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: details?.title || details?.name || 'Vidbanda',
+        text: `Watch ${details?.title || details?.name} on Vidbanda`,
+        url: window.location.href,
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
 
   // TV Show specific state
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
@@ -234,18 +250,62 @@ export const Details: React.FC = () => {
                 >
                   {inList ? (
                     <>
-                      <Check size={20} /> Added to List
+                      <Check size={20} /> Saved
                     </>
                   ) : (
                     <>
-                      <Plus size={20} /> Add to List
+                      <Bookmark size={20} /> Save
                     </>
                   )}
                 </button>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setIsLiked(!isLiked)}
+                    className={`p-3 sm:p-4 rounded-full transition-all ${
+                      isLiked 
+                        ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/30' 
+                        : 'bg-white/80 dark:bg-slate-800/80 text-slate-900 dark:text-white hover:bg-white dark:hover:bg-slate-800 backdrop-blur-sm'
+                    }`}
+                    title="Like"
+                  >
+                    <Heart size={20} className={isLiked ? 'fill-current' : ''} />
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className="p-3 sm:p-4 rounded-full bg-white/80 dark:bg-slate-800/80 text-slate-900 dark:text-white hover:bg-white dark:hover:bg-slate-800 transition-all backdrop-blur-sm"
+                    title="Share"
+                  >
+                    <Share2 size={20} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-3 justify-center md:justify-start">
+                <a
+                  href={SMARTLINK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all shadow-lg shadow-emerald-500/20"
+                >
+                  DIRECT DOWNLOAD
+                </a>
+                <a
+                  href={SMARTLINK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition-all shadow-lg shadow-amber-500/20"
+                >
+                  STREAM IN 4K
+                </a>
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="container mx-auto px-4 md:px-6 mt-6">
+        <ResponsiveBanner />
       </div>
 
       {/* Player Section */}
@@ -265,6 +325,22 @@ export const Details: React.FC = () => {
             season={selectedSeason} 
             episode={selectedEpisode} 
           />
+        </div>
+        
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AdBanner adKey="b7b9503357eacfd5d6a20f48a28440b7" width={300} height={250} />
+          <div className="flex flex-col justify-center items-center p-6 bg-slate-100 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <h3 className="text-lg font-bold mb-4">Support Vidbanda</h3>
+            <p className="text-sm text-center text-slate-500 mb-6">Click below to help us keep the servers running!</p>
+            <a
+              href={SMARTLINK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-center transition-all"
+            >
+              UNLOCK PREMIUM SERVERS
+            </a>
+          </div>
         </div>
         
         <div className="mt-8">
