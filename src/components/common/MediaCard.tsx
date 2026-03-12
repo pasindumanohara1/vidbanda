@@ -42,8 +42,9 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-400">
-            No Image
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-3">
+            <img src="/logo.png" alt="Vidbanda" className="w-12 h-12 opacity-30 grayscale" />
+            <span className="text-xs font-medium uppercase tracking-wider">No Image</span>
           </div>
         )}
         

@@ -21,7 +21,10 @@ export const MyList: React.FC = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-32 text-slate-500 dark:text-slate-400 text-center">
-          <Bookmark size={64} className="mb-4 opacity-20" />
+          <div className="relative mb-6">
+            <img src="/logo.png" alt="Vidbanda" className="w-24 h-24 opacity-20 grayscale" />
+            <Bookmark size={32} className="absolute -bottom-2 -right-2 text-slate-300 dark:text-slate-600" />
+          </div>
           <h2 className="text-2xl font-semibold mb-2 text-slate-900 dark:text-white">Your list is empty</h2>
           <p className="max-w-md">
             Save shows and movies to keep track of what you want to watch.

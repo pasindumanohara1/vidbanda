@@ -70,8 +70,15 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, mediaType, season = 1, 
       <div className="flex-1 relative">
         {isLoading && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm transition-opacity duration-300">
-            <RefreshCw className="animate-spin text-blue-500 mb-4" size={48} />
-            <p className="text-white font-medium text-lg animate-pulse">
+            <div className="relative w-24 h-24 flex items-center justify-center mb-6">
+              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-blue-500 animate-spin opacity-80"></div>
+              <img 
+                src="/logo.png" 
+                alt="Loading..." 
+                className="w-12 h-12 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+              />
+            </div>
+            <p className="text-white font-medium text-lg animate-pulse tracking-wide">
               Connecting to {servers[currentServerIndex].name}...
             </p>
           </div>

@@ -6,6 +6,7 @@ import { Play, Plus, Check, Star, Clock, Calendar, ArrowLeft, Youtube, X, Chevro
 import { useList } from '../context/ListContext';
 import { Player } from '../components/media/Player';
 import { MediaCard } from '../components/common/MediaCard';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const Details: React.FC = () => {
   const { type, id } = useParams<{ type: 'movie' | 'tv'; id: string }>();
@@ -60,11 +61,7 @@ export const Details: React.FC = () => {
   }, [type, id, selectedSeason]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!details) {
@@ -156,8 +153,9 @@ export const Details: React.FC = () => {
                   className="w-full h-auto"
                 />
               ) : (
-                <div className="w-full aspect-[2/3] flex items-center justify-center text-slate-400">
-                  No Image
+                <div className="w-full aspect-[2/3] flex flex-col items-center justify-center text-slate-400 gap-3">
+                  <img src="/logo.png" alt="Vidbanda" className="w-16 h-16 opacity-30 grayscale" />
+                  <span className="text-sm font-medium uppercase tracking-wider">No Image</span>
                 </div>
               )}
             </div>
@@ -270,8 +268,9 @@ export const Details: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
-                      No Image
+                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
+                      <img src="/logo.png" alt="Vidbanda" className="w-8 h-8 opacity-30 grayscale" />
+                      <span className="text-[10px] font-medium uppercase tracking-wider">No Image</span>
                     </div>
                   )}
                 </div>
@@ -323,8 +322,9 @@ export const Details: React.FC = () => {
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-400">
-                        No Image
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
+                        <img src="/logo.png" alt="Vidbanda" className="w-10 h-10 opacity-30 grayscale" />
+                        <span className="text-xs font-medium uppercase tracking-wider">No Image</span>
                       </div>
                     )}
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">

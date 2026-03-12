@@ -5,6 +5,7 @@ import { MediaItem } from '../types';
 import { MediaCard } from '../components/common/MediaCard';
 import { Filter, Search as SearchIcon } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const Search: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -202,9 +203,7 @@ export const Search: React.FC = () => {
 
       {/* Results */}
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
+        <LoadingSpinner />
       ) : results.length > 0 ? (
         <>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
