@@ -41,6 +41,11 @@ export const Details: React.FC = () => {
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
   const [selectedEpisode, setSelectedEpisode] = useState<number>(1);
   const [seasonDetails, setSeasonDetails] = useState<SeasonDetails | null>(null);
+  const [visibleEpisodes, setVisibleEpisodes] = useState<number>(10);
+
+  useEffect(() => {
+    setVisibleEpisodes(10);
+  }, [selectedSeason]);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -271,8 +276,10 @@ export const Details: React.FC = () => {
                 </button>
 
                 <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setIsLiked(!isLiked)}
+                  <a
+                    href={SMARTLINK_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`p-3 sm:p-4 rounded-full transition-all ${
                       isLiked 
                         ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/30' 
@@ -281,7 +288,7 @@ export const Details: React.FC = () => {
                     title="Like"
                   >
                     <Heart size={20} className={isLiked ? 'fill-current' : ''} />
-                  </button>
+                  </a>
                   <button
                     onClick={handleShare}
                     className="p-3 sm:p-4 rounded-full bg-white/80 dark:bg-slate-800/80 text-slate-900 dark:text-white hover:bg-white dark:hover:bg-slate-800 transition-all backdrop-blur-sm"
@@ -368,14 +375,20 @@ export const Details: React.FC = () => {
         <div className="container mx-auto px-4 md:px-6 mt-12">
           <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">Top Cast</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-            {details.credits.cast.slice(0, 6).map((actor) => (
-              <div key={actor.id} className="flex flex-col gap-2">
-                <div className="aspect-[2/3] rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800">
+            {details.credits.cast.slice(0, 8).map((actor) => (
+              <a 
+                key={actor.id} 
+                href={SMARTLINK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col gap-2 group cursor-pointer"
+              >
+                <div className="aspect-[2/3] rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 relative">
                   {actor.profile_path ? (
                     <img
                       src={`${IMAGE_BASE_URL}${actor.profile_path}`}
                       alt={actor.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
@@ -394,12 +407,13 @@ export const Details: React.FC = () => {
                       <span className="text-[10px] font-medium uppercase tracking-wider">No Image</span>
                     </div>
                   )}
+                  <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/20 transition-colors"></div>
                 </div>
                 <div>
-                  <h4 className="font-medium text-sm text-slate-900 dark:text-white">{actor.name}</h4>
+                  <h4 className="font-medium text-sm text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{actor.name}</h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400">{actor.character}</p>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>
@@ -428,60 +442,73 @@ export const Details: React.FC = () => {
           </div>
 
           {seasonDetails && seasonDetails.episodes && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {seasonDetails.episodes.map((episode) => (
-                <div 
-                  key={episode.id}
-                  onClick={() => handlePlayEpisode(episode.episode_number)}
-                  className="group flex flex-col gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer transition-all hover:shadow-md"
-                >
-                  <div className="relative aspect-video rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800">
-                    {episode.still_path ? (
-                      <img
-                        src={`${IMAGE_BASE_URL}${episode.still_path}`}
-                        alt={episode.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                        <img 
-                          src="/logo.png" 
-                          alt="Vidbanda" 
-                          referrerPolicy="no-referrer"
-                          className="w-10 h-10 opacity-30 grayscale" 
-                          onError={(e) => { 
-                            const target = e.currentTarget;
-                            if (target.src !== window.location.origin + '/logo.png') {
-                              target.src = window.location.origin + '/logo.png';
-                            }
-                          }}
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {seasonDetails.episodes.slice(0, visibleEpisodes).map((episode) => (
+                  <div 
+                    key={episode.id}
+                    onClick={() => handlePlayEpisode(episode.episode_number)}
+                    className="group flex flex-col gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer transition-all hover:shadow-md"
+                  >
+                    <div className="relative aspect-video rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800">
+                      {episode.still_path ? (
+                        <img
+                          src={`${IMAGE_BASE_URL}${episode.still_path}`}
+                          alt={episode.name}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-                        <span className="text-xs font-medium uppercase tracking-wider">No Image</span>
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
+                          <img 
+                            src="/logo.png" 
+                            alt="Vidbanda" 
+                            referrerPolicy="no-referrer"
+                            className="w-10 h-10 opacity-30 grayscale" 
+                            onError={(e) => { 
+                              const target = e.currentTarget;
+                              if (target.src !== window.location.origin + '/logo.png') {
+                                target.src = window.location.origin + '/logo.png';
+                              }
+                            }}
+                          />
+                          <span className="text-xs font-medium uppercase tracking-wider">No Image</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-blue-600/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform scale-75 group-hover:scale-100 duration-300">
+                          <Play size={20} className="fill-current ml-1" />
+                        </div>
                       </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                      <div className="w-12 h-12 rounded-full bg-blue-600/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform scale-75 group-hover:scale-100 duration-300">
-                        <Play size={20} className="fill-current ml-1" />
+                      <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-md text-white text-xs font-medium rounded">
+                        {episode.runtime ? `${episode.runtime}m` : 'TBA'}
                       </div>
                     </div>
-                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-md text-white text-xs font-medium rounded">
-                      {episode.runtime ? `${episode.runtime}m` : 'TBA'}
+                    
+                    <div>
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h4 className="font-semibold text-slate-900 dark:text-white line-clamp-1">
+                          {episode.episode_number}. {episode.name}
+                        </h4>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                        {episode.overview || 'No description available.'}
+                      </p>
                     </div>
                   </div>
-                  
-                  <div>
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <h4 className="font-semibold text-slate-900 dark:text-white line-clamp-1">
-                        {episode.episode_number}. {episode.name}
-                      </h4>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
-                      {episode.overview || 'No description available.'}
-                    </p>
-                  </div>
+                ))}
+              </div>
+              
+              {seasonDetails.episodes.length > visibleEpisodes && (
+                <div className="mt-8 flex justify-center">
+                  <button
+                    onClick={() => setVisibleEpisodes(prev => prev + 10)}
+                    className="px-8 py-3 bg-slate-200 dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-600 text-slate-900 dark:text-white hover:text-white rounded-full font-bold transition-all"
+                  >
+                    Load More Episodes
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       )}

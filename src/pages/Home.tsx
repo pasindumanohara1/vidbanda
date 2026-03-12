@@ -175,21 +175,62 @@ export const Home: React.FC = () => {
               <MediaCard key={item.id} item={{ ...item, media_type: 'tv' }} />
             ))}
           </div>
+          {/* Recommended Ad after Popular TV Shows */}
+          <div className="mt-8">
+            <NativeBanner />
+          </div>
           {/* Mobile only ad at bottom of section */}
           <div className="block sm:hidden mt-6">
             <AdBanner adKey="5d2edd3ac89c6c1954a1ef6a3db75a0c" width={320} height={50} />
           </div>
         </section>
 
-        {/* Infinite Trending Section */}
+        {/* Infinite Trending Section with Ads every 3 rows */}
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Trending This Week</h2>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
-            {trending.slice(1).map((item) => (
-              <MediaCard key={item.id} item={item} />
-            ))}
+          <div className="flex flex-col gap-12">
+            {(() => {
+              const items = trending.slice(1);
+              const rows: MediaItem[][] = [];
+              
+              // Responsive items per row
+              // xl: 8, lg: 6, md: 5, sm: 4, default: 3
+              let itemsPerRow = 3;
+              if (typeof window !== 'undefined') {
+                const width = window.innerWidth;
+                if (width >= 1280) itemsPerRow = 8;
+                else if (width >= 1024) itemsPerRow = 6;
+                else if (width >= 768) itemsPerRow = 5;
+                else if (width >= 640) itemsPerRow = 4;
+              }
+              
+              const chunkSize = itemsPerRow * 3; // 3 rows
+              
+              for (let i = 0; i < items.length; i += chunkSize) {
+                rows.push(items.slice(i, i + chunkSize));
+              }
+
+              return rows.map((chunk, index) => (
+                <React.Fragment key={index}>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
+                    {chunk.map((item) => (
+                      <MediaCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                  {/* Place ad after every chunk (which represents 3 rows) */}
+                  <div className="flex justify-center py-4">
+                    <div className="hidden md:block">
+                      <AdBanner adKey="720x90_placeholder" width={720} height={90} />
+                    </div>
+                    <div className="block md:hidden">
+                      <NativeBanner />
+                    </div>
+                  </div>
+                </React.Fragment>
+              ));
+            })()}
           </div>
           <div ref={observerTarget} className="py-2 flex justify-center min-h-[40px]">
             {page > 1 && hasMore && <LoadingSpinner />}
