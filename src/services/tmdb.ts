@@ -40,7 +40,7 @@ export const tmdb = {
     fetchFromTMDB<PaginatedResponse<MediaItem>>('/search/multi', { query, page: page.toString() }),
     
   getDetails: (id: number, mediaType: 'movie' | 'tv') => 
-    fetchFromTMDB<MediaDetails>(`/${mediaType}/${id}`, { append_to_response: 'credits,videos,similar' }),
+    fetchFromTMDB<MediaDetails>(`/${mediaType}/${id}`, { append_to_response: 'credits,videos,similar,external_ids' }),
     
   getSeasonDetails: (tvId: number, seasonNumber: number) =>
     fetchFromTMDB<SeasonDetails>(`/tv/${tvId}/season/${seasonNumber}`),

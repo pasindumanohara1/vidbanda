@@ -60,6 +60,13 @@ export interface MediaDetails extends MediaItem {
   similar: {
     results: MediaItem[];
   };
+  external_ids?: {
+    imdb_id?: string;
+    tvdb_id?: number;
+    facebook_id?: string;
+    instagram_id?: string;
+    twitter_id?: string;
+  };
 }
 
 export interface CastMember {

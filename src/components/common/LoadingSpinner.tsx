@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '@/src/assets/logo.png';
 
 export const LoadingSpinner: React.FC = () => {
   return (
@@ -8,7 +9,7 @@ export const LoadingSpinner: React.FC = () => {
         <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-blue-500 animate-spin opacity-80"></div>
         {/* Inner pulsing logo */}
         <img 
-          src="/logo.png" 
+          src={logo} 
           alt="Loading..." 
           className="w-20 h-20 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
         />

@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
 import { Settings, RefreshCw } from 'lucide-react';
+import logo from '@/src/assets/logo.png';
 
 interface PlayerProps {
   mediaId: string;
+  imdbId?: string;
   mediaType: 'movie' | 'tv';
   season?: number;
   episode?: number;
 }
 
-export const Player: React.FC<PlayerProps> = ({ mediaId, mediaType, season = 1, episode = 1 }) => {
+export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, season = 1, episode = 1 }) => {
   const servers = [
     { id: 'vidlink', name: 'VidLink', url: 'https://vidlink.pro' },
-    { id: 'vidsrc', name: 'VidSrc', url: 'https://vidsrc.net' },
-    { id: 'vidsrcin', name: 'VidSrc.in', url: 'https://vidsrc.in' },
-    { id: 'vidsrcpm', name: 'VidSrc.pm', url: 'https://vidsrc.pm' },
-    { id: 'vidsrcxyz', name: 'VidSrc.xyz', url: 'https://vidsrc.xyz' },
-    { id: 'embedsu', name: 'Embed.su', url: 'https://embed.su' },
-    { id: 'autoembed', name: 'AutoEmbed', url: 'https://autoembed.to' },
-    { id: 'multiembed', name: 'MultiEmbed', url: 'https://multiembed.mov' },
+    { id: 'vidsrc-net', name: 'VidSrc.net', url: 'https://vidsrc.net' },
+    { id: 'vidsrc-in', name: 'VidSrc.in', url: 'https://vidsrc.in' },
+    { id: 'vidsrc-pm', name: 'VidSrc.pm', url: 'https://vidsrc.pm' },
+    { id: 'vidsrc-xyz', name: 'VidSrc.xyz', url: 'https://vidsrc.xyz' },
+    { id: 'vidsrc-to', name: 'VidSrc.to', url: 'https://vidsrc.to' },
+    { id: 'embed-su', name: 'Embed.su', url: 'https://embed.su' },
+    { id: '2embed', name: '2Embed', url: 'https://www.2embed.cc' },
+    { id: 'vidbinge', name: 'VidBinge', url: 'https://vidbinge.to' },
+    { id: 'frembed', name: 'FREMbed', url: 'https://frembed.com' },
   ];
 
   const [currentServerIndex, setCurrentServerIndex] = useState(0);
@@ -25,30 +29,47 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, mediaType, season = 1, 
   const [isLoading, setIsLoading] = useState(true);
 
   const getEmbedUrl = (server: typeof servers[0]) => {
+    const id = imdbId || mediaId;
+    
     switch (server.id) {
       case 'vidlink':
         return mediaType === 'movie'
           ? `${server.url}/movie/${mediaId}?primaryColor=3B82F6&autoplay=false`
           : `${server.url}/tv/${mediaId}/${season}/${episode}?primaryColor=3B82F6&autoplay=false`;
-      case 'vidsrc':
-      case 'vidsrcin':
-      case 'vidsrcpm':
-      case 'vidsrcxyz':
+      
+      case 'vidsrc-net':
+      case 'vidsrc-in':
+      case 'vidsrc-pm':
+      case 'vidsrc-xyz':
+        return mediaType === 'movie'
+          ? `${server.url}/embed/movie/${id}`
+          : `${server.url}/embed/tv/${id}/${season}/${episode}`;
+      
+      case 'vidsrc-to':
         return mediaType === 'movie'
           ? `${server.url}/embed/movie/${mediaId}`
           : `${server.url}/embed/tv/${mediaId}/${season}/${episode}`;
-      case 'embedsu':
+          
+      case 'embed-su':
         return mediaType === 'movie'
-          ? `${server.url}/embed/movie/${mediaId}`
-          : `${server.url}/embed/tv/${mediaId}/${season}/${episode}`;
-      case 'multiembed':
+          ? `${server.url}/embed/movie/${id}`
+          : `${server.url}/embed/tv/${id}/${season}/${episode}`;
+          
+      case '2embed':
         return mediaType === 'movie'
-          ? `${server.url}/?video_id=${mediaId}&tmdb=1`
-          : `${server.url}/?video_id=${mediaId}&tmdb=1&s=${season}&e=${episode}`;
-      case 'autoembed':
+          ? `${server.url}/embed/${id}`
+          : `${server.url}/embedtv/${id}&s=${season}&e=${episode}`;
+          
+      case 'vidbinge':
         return mediaType === 'movie'
-          ? `${server.url}/movie/tmdb/${mediaId}`
-          : `${server.url}/tv/tmdb/${mediaId}-${season}-${episode}`;
+          ? `${server.url}/movie/${id}`
+          : `${server.url}/tv/${id}/${season}/${episode}`;
+          
+      case 'frembed':
+        return mediaType === 'movie'
+          ? `${server.url}/api/film.php?id=${mediaId}`
+          : `${server.url}/api/serie.php?id=${mediaId}&sa=${season}&epi=${episode}`;
+          
       default:
         return mediaType === 'movie'
           ? `https://vidlink.pro/movie/${mediaId}?primaryColor=3B82F6&autoplay=false`
@@ -69,7 +90,7 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, mediaType, season = 1, 
             <div className="relative w-24 h-24 flex items-center justify-center mb-6">
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-blue-500 animate-spin opacity-80"></div>
               <img 
-                src="/logo.png" 
+                src={logo} 
                 alt="Loading..." 
                 className="w-12 h-12 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
               />
