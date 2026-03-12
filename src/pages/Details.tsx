@@ -185,6 +185,7 @@ export const Details: React.FC = () => {
                   <img 
                     src="/logo.png" 
                     alt="Vidbanda" 
+                    referrerPolicy="no-referrer"
                     className="w-16 h-16 opacity-30 grayscale" 
                     onError={(e) => { 
                       const target = e.currentTarget;
@@ -381,6 +382,7 @@ export const Details: React.FC = () => {
                       <img 
                         src="/logo.png" 
                         alt="Vidbanda" 
+                        referrerPolicy="no-referrer"
                         className="w-8 h-8 opacity-30 grayscale" 
                         onError={(e) => { 
                           const target = e.currentTarget;
@@ -445,6 +447,7 @@ export const Details: React.FC = () => {
                         <img 
                           src="/logo.png" 
                           alt="Vidbanda" 
+                          referrerPolicy="no-referrer"
                           className="w-10 h-10 opacity-30 grayscale" 
                           onError={(e) => { 
                             const target = e.currentTarget;

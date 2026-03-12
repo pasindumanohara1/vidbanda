@@ -45,6 +45,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
             <img 
               src="/logo.png" 
               alt="Vidbanda" 
+              referrerPolicy="no-referrer"
               className="w-12 h-12 opacity-30 grayscale" 
               onError={(e) => { 
                 const target = e.currentTarget;

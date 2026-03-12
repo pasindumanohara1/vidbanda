@@ -30,6 +30,7 @@ export const MyList: React.FC = () => {
             <img 
               src="/logo.png" 
               alt="Vidbanda" 
+              referrerPolicy="no-referrer"
               className="w-24 h-24 opacity-20 grayscale" 
               onError={(e) => { 
                 const target = e.currentTarget;

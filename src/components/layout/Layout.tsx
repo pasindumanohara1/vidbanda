@@ -15,6 +15,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <img 
             src="/logo.png" 
             alt="Vidbanda" 
+            referrerPolicy="no-referrer"
             className="h-8 opacity-50 hover:opacity-100 transition-opacity duration-300 grayscale hover:grayscale-0" 
             onError={(e) => { 
               const target = e.currentTarget;

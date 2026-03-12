@@ -9,6 +9,7 @@ export const LoadingSpinner: React.FC = () => {
         <img 
           src="/logo.png" 
           alt="Loading..." 
+          referrerPolicy="no-referrer"
           className="w-20 h-20 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
           onError={(e) => { 
             const target = e.currentTarget;

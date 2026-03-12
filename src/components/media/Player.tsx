@@ -113,6 +113,7 @@ export const Player: React.FC<PlayerProps> = ({ mediaId, imdbId, mediaType, seas
               <img 
                 src="/logo.png" 
                 alt="Loading..." 
+                referrerPolicy="no-referrer"
                 className="w-12 h-12 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
                 onError={(e) => { 
                   const target = e.currentTarget;
